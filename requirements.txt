@@ -1,5 +1,6 @@
 tensorflow
 streamlit
+streamlit-folium
 folium
 googlemaps
 pandas
