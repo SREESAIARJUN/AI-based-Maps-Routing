@@ -45,7 +45,7 @@ st.set_page_config(page_title="AI Smart Car Assistant", layout="wide")
 st.title("🚗 AI-Powered Smart Car Assistant")
 st.markdown("Suggests **optimal driving routes** using AI + Google Maps.\n")
 
-start_place = st.text_input("📍 Enter Start Location", "Gachibowli, Hyderabad")
+start_place = st.text_input("📍 Enter Start Location", "Bengaluru Palace")
 end_place = st.text_input("📍 Enter Destination", "Chennai Central")
 
 if st.button("🔍 Find Routes"):
