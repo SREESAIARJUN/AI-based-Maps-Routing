@@ -1,0 +1,12 @@
+tensorflow
+streamlit
+folium
+googlemaps
+pandas
+numpy
+scikit-learn
+joblib
+osmnx
+geopandas
+haversine
+python-dotenv
