@@ -4,3 +4,4 @@ polyline
 requests
 scikit-learn
 streamlit-folium
+xgboost
