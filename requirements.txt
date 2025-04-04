@@ -1,12 +1,8 @@
 streamlit
-tensorflow
-joblib
-googlemaps
 folium
 streamlit-folium
-numpy
-haversine
-python-dotenv
 pandas
-plotly
-polyline
+xgboost
+scikit-learn
+numpy
+requests
