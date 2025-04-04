@@ -2,6 +2,7 @@ tensorflow
 streamlit
 streamlit-folium
 folium
+plotly
 googlemaps
 pandas
 numpy
