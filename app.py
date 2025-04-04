@@ -82,13 +82,18 @@ if st.button("🔍 Find Routes"):
             for i, route in enumerate(routes):
                 color = ["green", "orange", "purple"][i % 3]
                 folium.PolyLine(locations=route['polyline'], color=color, weight=5, popup=f"Route {i+1}").add_to(route_map)
-
-                duration_min = int(route['duration_sec'] // 60)
+            
+                total_minutes = int(route['duration_sec'] // 60)
+                hours = total_minutes // 60
+                minutes = total_minutes % 60
+                duration_str = f"{hours} hr {minutes} min" if hours else f"{minutes} min"
+            
                 eta = now + timedelta(seconds=route['duration_sec'])
                 eta_str = eta.strftime("%I:%M %p")
 
-                st.markdown(f"### 🛤️ Route {i+1}")
-                st.info(f"⏱️ **Live Traffic Duration**: {duration_min} min  \n🕒 **ETA**: {eta_str}")
+    st.markdown(f"### 🛤️ Route {i+1}")
+    st.info(f"⏱️ **Live Traffic Duration**: {duration_str}  \n🕒 **ETA**: {eta_str}")
+
 
             st.subheader("🗺️ Map View with Real Routes")
             folium_static(route_map)
