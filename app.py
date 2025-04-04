@@ -91,8 +91,8 @@ if st.button("🔍 Find Routes"):
                 eta = now + timedelta(seconds=route['duration_sec'])
                 eta_str = eta.strftime("%I:%M %p")
 
-    st.markdown(f"### 🛤️ Route {i+1}")
-    st.info(f"⏱️ **Live Traffic Duration**: {duration_str}  \n🕒 **ETA**: {eta_str}")
+                st.markdown(f"### 🛤️ Route {i+1}")
+                st.info(f"⏱️ **Live Traffic Duration**: {duration_str}  \n🕒 **ETA**: {eta_str}")
 
 
             st.subheader("🗺️ Map View with Real Routes")
