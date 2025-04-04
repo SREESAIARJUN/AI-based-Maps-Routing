@@ -13,10 +13,8 @@ import pandas as pd
 import plotly.express as px
 import polyline  # For decoding polyline strings
 
-# Load environment variables
-load_dotenv()
-GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 
+GOOGLE_MAPS_API_KEY = 'AIzaSyD5ELJ03IEUL98JtLBnSN_IKMOHfxOB9Jw'
 # Page configuration
 st.set_page_config(
     page_title="Smart Car Assistant - India",
