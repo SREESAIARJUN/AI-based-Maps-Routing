@@ -46,14 +46,14 @@ gmaps = googlemaps.Client(key='AIzaSyD5ELJ03IEUL98JtLBnSN_IKMOHfxOB9Jw')
 # Load model and scaler
 @st.cache_resource
 def load_models():
-    model = tf.keras.models.load_model('results/smart_car_assistant_model.h5')
-    scaler = joblib.load('results/scaler.pkl')
+    model = tf.keras.models.load_model('smart_car_assistant_model.h5')
+    scaler = joblib.load('scaler.pkl')
     return model, scaler
 
 # Load historical data
 @st.cache_data
 def load_historical_data():
-    return pd.read_csv('results/raw_route_data.csv')
+    return pd.read_csv('raw_route_data.csv')
 
 # City information
 CITIES = {
