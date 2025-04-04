@@ -3,16 +3,17 @@ import folium
 import pickle
 import requests
 import polyline
+from datetime import datetime, timedelta
 from streamlit_folium import folium_static
 
-# Load trained ML model
+# Load ML model
 with open("model.pkl", "rb") as f:
     model = pickle.load(f)
 
-# Google Maps API Key (Replace with your key)
+# Google Maps API Key
 GOOGLE_MAPS_API_KEY = "AIzaSyD5ELJ03IEUL98JtLBnSN_IKMOHfxOB9Jw"
 
-# Convert place name to latitude and longitude
+# Get coordinates for a place
 def get_lat_lng(place_name):
     url = f"https://maps.googleapis.com/maps/api/geocode/json?address={place_name}&key={GOOGLE_MAPS_API_KEY}"
     response = requests.get(url)
@@ -23,59 +24,73 @@ def get_lat_lng(place_name):
     else:
         return None, None
 
-# Get driving directions (polyline route)
+# Get directions (all alternate routes)
 def get_directions(start, end):
-    url = f"https://maps.googleapis.com/maps/api/directions/json?origin={start}&destination={end}&mode=driving&key={GOOGLE_MAPS_API_KEY}"
+    url = f"https://maps.googleapis.com/maps/api/directions/json?origin={start}&destination={end}&mode=driving&alternatives=true&departure_time=now&key={GOOGLE_MAPS_API_KEY}"
     res = requests.get(url)
     data = res.json()
     if data['status'] == 'OK':
-        steps_polyline = data['routes'][0]['overview_polyline']['points']
-        return polyline.decode(steps_polyline)
+        routes = data['routes']
+        results = []
+        for route in routes:
+            poly = polyline.decode(route['overview_polyline']['points'])
+            duration_sec = route['legs'][0]['duration_in_traffic']['value']
+            results.append({'polyline': poly, 'duration_sec': duration_sec})
+        return results
     else:
         return None
 
-# UI
-st.set_page_config(page_title="AI-Powered Smart Car Assistant", layout="wide")
+# Streamlit UI
+st.set_page_config(page_title="AI Smart Car Assistant", layout="wide")
 st.title("🚗 AI-Powered Smart Car Assistant")
-st.write("Get **optimal driving routes** and estimated time with AI + Google Maps.")
+st.markdown("Suggests **optimal driving routes** using AI + Google Maps.\n")
 
-# Inputs
 start_place = st.text_input("📍 Enter Start Location", "Gachibowli, Hyderabad")
 end_place = st.text_input("📍 Enter Destination", "Chennai Central")
 
-if st.button("🔍 Find Optimal Route"):
+if st.button("🔍 Find Routes"):
     start_lat, start_lng = get_lat_lng(start_place)
     end_lat, end_lng = get_lat_lng(end_place)
 
     if None in (start_lat, start_lng, end_lat, end_lng):
-        st.error("❌ Couldn't fetch location coordinates. Check the place names.")
+        st.error("❌ Unable to get coordinates. Please check location names.")
     else:
-        # Feature engineering
-        distance_km = ((start_lat - end_lat) ** 2 + (start_lng - end_lng) ** 2) ** 0.5 * 111  # rough estimate
-        steps = 10  # Static or calculated if directions API provides it
-
-        # Predict duration (minutes)
+        # Predict with your ML model
+        distance_km = ((start_lat - end_lat)**2 + (start_lng - end_lng)**2)**0.5 * 111
+        steps = 10  # Approximate
         predicted_time = model.predict([[distance_km, steps]])[0]
         total_minutes = int(predicted_time)
         hours = total_minutes // 60
         minutes = total_minutes % 60
-        time_str = f"{hours} hr {minutes} min" if hours > 0 else f"{minutes} min"
+        time_str = f"{hours} hr {minutes} min" if hours else f"{minutes} min"
 
-        # Show prediction
-        st.success(f"⏱️ Predicted Travel Time (with traffic): **{time_str}**")
+        st.subheader("🧠 Trained Model Prediction")
+        st.success(f"📊 Estimated Travel Time: **{time_str}**")
 
-        # Get realistic driving route
-        route_coords = get_directions(start_place, end_place)
+        # Directions from Google
+        routes = get_directions(start_place, end_place)
 
-        if route_coords:
-            # Map setup
-            route_map = folium.Map(location=[(start_lat + end_lat) / 2, (start_lng + end_lng) / 2], zoom_start=7)
+        if routes:
+            st.subheader("🛣️ Live Route Suggestions from Google")
+            route_map = folium.Map(location=[(start_lat + end_lat)/2, (start_lng + end_lng)/2], zoom_start=7)
 
             folium.Marker([start_lat, start_lng], popup=f"Start: {start_place}", icon=folium.Icon(color="blue")).add_to(route_map)
             folium.Marker([end_lat, end_lng], popup=f"End: {end_place}", icon=folium.Icon(color="red")).add_to(route_map)
-            folium.PolyLine(locations=route_coords, color="green", weight=5).add_to(route_map)
 
-            st.subheader("🗺️ Route Map")
+            now = datetime.now()
+
+            for i, route in enumerate(routes):
+                color = ["green", "orange", "purple"][i % 3]
+                folium.PolyLine(locations=route['polyline'], color=color, weight=5, popup=f"Route {i+1}").add_to(route_map)
+
+                duration_min = int(route['duration_sec'] // 60)
+                eta = now + timedelta(seconds=route['duration_sec'])
+                eta_str = eta.strftime("%I:%M %p")
+
+                st.markdown(f"### 🛤️ Route {i+1}")
+                st.info(f"⏱️ **Live Traffic Duration**: {duration_min} min  \n🕒 **ETA**: {eta_str}")
+
+            st.subheader("🗺️ Map View with Real Routes")
             folium_static(route_map)
         else:
-            st.warning("⚠️ Couldn't retrieve route from Google Directions API.")
+            st.warning("⚠️ Couldn't fetch routes from Google Directions API.")
