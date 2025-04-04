@@ -43,9 +43,14 @@ if st.button("Find Optimal Route"):
         distance_km = ((start_lat - end_lat) ** 2 + (start_lng - end_lng) ** 2) ** 0.5 * 111
         steps = 10  # Estimate or placeholder for number of turns
         
-        # Predict duration
         predicted_time = model.predict([[distance_km, steps]])[0]
-        st.success(f"⏱️ Predicted Travel Time (With Traffic): {predicted_time:.2f} minutes")
+        total_minutes = int(predicted_time)
+        hours = total_minutes // 60
+        minutes = total_minutes % 60
+        
+        time_str = f"{hours} hr {minutes} min" if hours > 0 else f"{minutes} min"
+        st.success(f"⏱️ Predicted Travel Time (With Traffic): {time_str}")
+
 
         # Visualize route
         route_map = folium.Map(location=[(start_lat + end_lat) / 2, (start_lng + end_lng) / 2], zoom_start=7)
