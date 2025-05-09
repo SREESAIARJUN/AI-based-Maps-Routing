@@ -314,13 +314,13 @@ def main():
     with col1:
         st.markdown('<div class="input-container">', unsafe_allow_html=True)
         st.markdown('<span class="location-icon">📍</span> Enter Start Location', unsafe_allow_html=True)
-        start_place = st.text_input("", "India Gate", label_visibility="collapsed")
+        start_place = st.text_input("", "Bengaluru Palace", label_visibility="collapsed")
         st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
         st.markdown('<div class="input-container">', unsafe_allow_html=True)
         st.markdown('<span class="location-icon">📍</span> Enter Destination', unsafe_allow_html=True)
-        end_place = st.text_input(" ", "Taj Mahal", label_visibility="collapsed")
+        end_place = st.text_input(" ", "Chennai Central", label_visibility="collapsed")
         st.markdown('</div>', unsafe_allow_html=True)
     
     # Search button
