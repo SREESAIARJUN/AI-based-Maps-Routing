@@ -292,16 +292,6 @@ def format_duration(seconds):
     minutes = total_minutes % 60
     return f"{hours} hr {minutes} min" if hours else f"{minutes} min"
 
-# Create a dark-themed folium map
-def create_dark_map(center_lat, center_lng, zoom=7):
-    m = folium.Map(
-        location=[center_lat, center_lng],
-        zoom_start=zoom,
-        tiles="CartoDB dark_matter",
-        control_scale=True
-    )
-    return m
-
 # Main application
 def main():
     # Load model
@@ -399,8 +389,11 @@ def main():
             # Display routes
             st.markdown('<div class="section-header">🛣️ Live Route Suggestions</div>', unsafe_allow_html=True)
             
-            # Create map
-            route_map = create_dark_map((start_lat + end_lat)/2, (start_lng + end_lng)/2)
+            # Create map - KEEPING THE ORIGINAL MAP STYLE
+            route_map = folium.Map(
+                location=[(start_lat + end_lat)/2, (start_lng + end_lng)/2],
+                zoom_start=7
+            )
             
             # Add markers
             folium.Marker(
@@ -420,7 +413,7 @@ def main():
             # Current time
             now = datetime.now()
             
-            # Route colors
+            # Route colors - using bright colors that stand out on the default map
             route_colors = ["#2196F3", "#00BCD4", "#4CAF50", "#FFC107", "#FF5722"]
             
             # Display routes
