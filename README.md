@@ -1,6 +1,6 @@
 # AI Smart Car Assistant
 
-# Live Demo - Click Here [https://ai-based-maps-routing.streamlit.app/]
+# Live Demo - (Click Here)[https://ai-based-maps-routing.streamlit.app/]
 
 ## Overview
 AI Smart Car Assistant is a Streamlit application that combines machine learning with Google Maps API to suggest optimal driving routes between locations. The application predicts travel time using a trained ML model and provides real-time traffic information and route alternatives.
