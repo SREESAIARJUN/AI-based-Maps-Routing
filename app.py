@@ -8,70 +8,194 @@ import time
 from datetime import datetime, timedelta
 from streamlit_folium import folium_static
 
-# Page configuration with improved styling
+# Page configuration
 st.set_page_config(
     page_title="AI Smart Car Assistant",
     page_icon="🚗",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for better UI
+# Modern dark theme CSS
 st.markdown("""
 <style>
+    /* Base theme - dark mode */
+    .stApp {
+        background-color: #0f1117;
+        color: #e0e0e0;
+    }
+    
+    /* Typography */
+    h1, h2, h3, h4, h5, h6 {
+        color: #e0e0e0 !important;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Main header */
     .main-header {
-        font-size: 2.5rem;
-        color: #1E88E5;
-        margin-bottom: 0.5rem;
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: #2196F3 !important;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        line-height: 1.2;
     }
-    .sub-header {
-        font-size: 1.2rem;
-        color: #424242;
+    
+    /* Subtitle */
+    .subtitle {
+        font-size: 1rem;
+        color: #9e9e9e !important;
+        margin-top: 0;
         margin-bottom: 2rem;
+        font-weight: 400;
     }
-    .card {
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
+    
+    /* Section headers */
+    .section-header {
+        display: flex;
+        align-items: center;
+        font-size: 1.5rem;
+        color: #e0e0e0 !important;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
     }
+    
+    .section-header svg {
+        margin-right: 0.5rem;
+    }
+    
+    /* Input fields */
+    .stTextInput > div > div {
+        background-color: #1a1f2c !important;
+        color: #e0e0e0 !important;
+        border-radius: 8px !important;
+        border: 1px solid #2d3748 !important;
+    }
+    
+    .stTextInput > label {
+        color: #e0e0e0 !important;
+        font-weight: 500 !important;
+    }
+    
+    /* Button styling */
+    .stButton > button {
+        background-color: #2196F3 !important;
+        color: white !important;
+        font-weight: 600 !important;
+        border-radius: 8px !important;
+        padding: 0.5rem 1rem !important;
+        border: none !important;
+        width: 100% !important;
+        height: 2.5rem !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stButton > button:hover {
+        background-color: #1976D2 !important;
+        box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3) !important;
+    }
+    
+    /* Route cards */
     .route-card {
-        background-color: #f1f8e9;
-        border-radius: 10px;
+        background-color: #1a1f2c;
+        border-radius: 8px;
         padding: 15px;
         margin-bottom: 15px;
-        border-left: 5px solid #7cb342;
+        border-left: 4px solid #2196F3;
     }
+    
+    /* Prediction card */
+    .prediction-card {
+        background-color: rgba(33, 150, 243, 0.1);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(33, 150, 243, 0.3);
+    }
+    
+    /* Info text */
     .info-text {
-        color: #424242;
-        font-size: 1rem;
+        color: #9e9e9e;
+        font-size: 0.9rem;
     }
+    
+    /* Highlight text */
     .highlight {
-        font-weight: bold;
-        color: #1E88E5;
+        font-weight: 600;
+        color: #2196F3;
     }
-    .stButton>button {
-        background-color: #1E88E5;
-        color: white;
-        font-weight: bold;
-        border-radius: 5px;
-        padding: 0.5rem 1rem;
-        width: 100%;
+    
+    /* Progress bar */
+    .stProgress > div > div > div {
+        background-color: #2196F3 !important;
     }
-    .error-message {
-        background-color: #ffebee;
-        color: #c62828;
-        padding: 10px;
-        border-radius: 5px;
-        margin-bottom: 10px;
+    
+    /* Remove default Streamlit padding */
+    .block-container {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
     }
-    .success-message {
-        background-color: #e8f5e9;
-        color: #2e7d32;
-        padding: 10px;
-        border-radius: 5px;
-        margin-bottom: 10px;
+    
+    /* Footer */
+    .footer {
+        text-align: center;
+        color: #9e9e9e;
+        font-size: 0.8rem;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #2d3748;
+    }
+    
+    /* Location icon */
+    .location-icon {
+        color: #f06292;
+        margin-right: 0.5rem;
+    }
+    
+    /* Input container */
+    .input-container {
+        margin-bottom: 1rem;
+    }
+    
+    /* Map container */
+    .map-container {
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 1rem;
+    }
+    
+    /* Route metrics */
+    .route-metrics {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0.5rem;
+    }
+    
+    .metric {
+        display: flex;
+        align-items: center;
+    }
+    
+    .metric-icon {
+        margin-right: 0.3rem;
+        color: #2196F3;
+    }
+    
+    /* Hide Streamlit branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    
+    /* Custom divider */
+    .divider {
+        height: 1px;
+        background-color: #2d3748;
+        margin: 1.5rem 0;
+    }
+    
+    /* Spinner */
+    .stSpinner > div > div {
+        border-top-color: #2196F3 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -168,6 +292,16 @@ def format_duration(seconds):
     minutes = total_minutes % 60
     return f"{hours} hr {minutes} min" if hours else f"{minutes} min"
 
+# Create a dark-themed folium map
+def create_dark_map(center_lat, center_lng, zoom=7):
+    m = folium.Map(
+        location=[center_lat, center_lng],
+        zoom_start=zoom,
+        tiles="CartoDB dark_matter",
+        control_scale=True
+    )
+    return m
+
 # Main application
 def main():
     # Load model
@@ -175,21 +309,28 @@ def main():
     if model is None:
         st.stop()
     
-    # Application header
-    st.markdown('<div class="main-header">🚗 AI-Powered Smart Car Assistant</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Suggests optimal driving routes using AI + Google Maps</div>', unsafe_allow_html=True)
+    # Application header with car icon
+    st.markdown("""
+    <div style="display: flex; align-items: center;">
+        <span style="font-size: 2rem; margin-right: 0.5rem;">🚗</span>
+        <h1 class="main-header">AI-Powered Smart Car Assistant</h1>
+    </div>
+    <p class="subtitle">Suggests optimal driving routes using AI + Google Maps</p>
+    """, unsafe_allow_html=True)
     
     # Create two columns for input
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        start_place = st.text_input("📍 Enter Start Location", "Bengaluru Palace")
+        st.markdown('<div class="input-container">', unsafe_allow_html=True)
+        st.markdown('<span class="location-icon">📍</span> Enter Start Location', unsafe_allow_html=True)
+        start_place = st.text_input("", "Bengaluru Palace", label_visibility="collapsed")
         st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        end_place = st.text_input("📍 Enter Destination", "Chennai Central")
+        st.markdown('<div class="input-container">', unsafe_allow_html=True)
+        st.markdown('<span class="location-icon">📍</span> Enter Destination', unsafe_allow_html=True)
+        end_place = st.text_input(" ", "Chennai Central", label_visibility="collapsed")
         st.markdown('</div>', unsafe_allow_html=True)
     
     # Search button
@@ -245,17 +386,21 @@ def main():
             progress_bar.empty()
             
             # Display AI prediction
-            st.markdown('<div class="card">', unsafe_allow_html=True)
-            st.subheader("🧠 AI Model Prediction")
-            st.markdown(f"<div class='success-message'>📊 Estimated Travel Time: <span class='highlight'>{time_str}</span></div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown('<div class="section-header">🧠 AI Model Prediction</div>', unsafe_allow_html=True)
+            st.markdown(f"""
+            <div class="prediction-card">
+                <div style="display: flex; align-items: center;">
+                    <span style="font-size: 1.5rem; margin-right: 0.5rem;">📊</span>
+                    <span>Estimated Travel Time: <span class="highlight">{time_str}</span></span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             
             # Display routes
-            st.markdown('<div class="card">', unsafe_allow_html=True)
-            st.subheader("🛣️ Live Route Suggestions")
+            st.markdown('<div class="section-header">🛣️ Live Route Suggestions</div>', unsafe_allow_html=True)
             
             # Create map
-            route_map = folium.Map(location=[(start_lat + end_lat)/2, (start_lng + end_lng)/2], zoom_start=7)
+            route_map = create_dark_map((start_lat + end_lat)/2, (start_lng + end_lng)/2)
             
             # Add markers
             folium.Marker(
@@ -276,7 +421,7 @@ def main():
             now = datetime.now()
             
             # Route colors
-            route_colors = ["green", "orange", "purple", "blue", "red"]
+            route_colors = ["#2196F3", "#00BCD4", "#4CAF50", "#FFC107", "#FF5722"]
             
             # Display routes
             for i, route in enumerate(routes):
@@ -301,32 +446,42 @@ def main():
                 distance_km = route['distance_m'] / 1000
                 
                 # Display route information
-                st.markdown(f'<div class="route-card">', unsafe_allow_html=True)
-                st.markdown(f"#### 🛤️ Route {i+1}: {route['summary']}")
-                
-                # Create columns for route details
-                r_col1, r_col2, r_col3 = st.columns(3)
-                with r_col1:
-                    st.markdown(f"⏱️ **Duration**: {duration_str}")
-                with r_col2:
-                    st.markdown(f"🕒 **ETA**: {eta_str}")
-                with r_col3:
-                    st.markdown(f"📏 **Distance**: {distance_km:.1f} km")
-                
-                st.markdown("</div>", unsafe_allow_html=True)
+                st.markdown(f"""
+                <div class="route-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4 style="margin: 0;">🛤️ Route {i+1}: {route['summary']}</h4>
+                        <span class="highlight">{duration_str}</span>
+                    </div>
+                    <div class="route-metrics">
+                        <div class="metric">
+                            <span class="metric-icon">🕒</span>
+                            <span>ETA: {eta_str}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-icon">📏</span>
+                            <span>Distance: {distance_km:.1f} km</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-icon">🚦</span>
+                            <span>Steps: {route['steps']}</span>
+                        </div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
             
             # Display map
-            st.subheader("🗺️ Interactive Map")
-            folium_static(route_map)
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown('<div class="section-header">🗺️ Interactive Map</div>', unsafe_allow_html=True)
+            st.markdown('<div class="map-container">', unsafe_allow_html=True)
+            folium_static(route_map, width=1320)
+            st.markdown('</div>', unsafe_allow_html=True)
             
         except Exception as e:
             st.error(f"An error occurred during processing: {str(e)}")
     
     # Add footer with information
-    st.markdown("---")
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     st.markdown("""
-    <div style="text-align: center; color: #666;">
+    <div class="footer">
         <p>AI Smart Car Assistant uses machine learning and Google Maps API to provide route suggestions.</p>
         <p>© 2023 AI Smart Car Assistant</p>
     </div>
